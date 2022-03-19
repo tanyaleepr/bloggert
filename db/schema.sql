@@ -1,0 +1,3 @@
+DROP DATABASE IF EXISTS bloggert_db;
+
+CREATE DATABASE bloggert_db;
