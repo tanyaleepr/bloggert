@@ -1,44 +1,62 @@
-const express = require('express');
-const routes = require('./controllers');
-const sequelize = require('./config/connection');
-const path = require('path');
-const helpers = require('./utils/helpers');
-const exphbs = require('express-handlebars');
-const hbs = exphbs.create({ helpers });
-const session = require('express-session');
-
-
-
+const express = require("express");
 const app = express();
-const PORT = process.env.PORT || 3001;
 
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const path = require("path");
 
+
+const sequelize = require("./config/connection");
+
+// handlebars 
+const exphbs = require("express-handlebars");
+const helpers = require("./utils/helpers");
+const hbs = exphbs.create({ helpers });
+app.set("view engine", "handlebars");
+app.engine("handlebars", hbs.engine);
+
+// cookies
+const session = require("express-session");
+const SequelizeStore = require("connect-session-sequelize")(session.Store);
 const sess = {
-  secret: 'bigbluedog',
-  cookie: {
-        expires: 10 * 60 * 1000
-  },
-  resave: true,
-  rolling: true,
+  secret: process.env.SESSION_SECRET,
+  cookie: {},
+  resave: false,
   saveUninitialized: true,
-  store: new SequelizeStore({
-    db: sequelize
-  }),
+  store: new SequelizeStore({ db: sequelize }),
 };
 
+// const sess = {
+//   secret: 'aguila',
+//   cookie: {
+        
+//         expires: 10 * 60 * 1200
+//   },
+//   resave: true,
+//   rolling: true,
+//   saveUninitialized: true,
+//   store: new SequelizeStore({
+//     db: sequelize
+//   }),
+// };
+// sessions
 app.use(session(sess));
 
+// process.on('uncaughtException', function (err) {
+//   console.log(err);
+// }); 
+
+
+//the middle
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, "public")));
 
-app.engine('handlebars', hbs.engine);
-app.set('view engine', 'handlebars');
 
-app.use(routes);
 
-// turn on connection to db and server
+// routes
+app.use(require("./controllers/index"));
+
+// db and server
+const PORT = process.env.PORT || 3001;
 sequelize.sync({ force: false }).then(() => {
-  app.listen(PORT, () => console.log('Now listening'));
+  app.listen(PORT, () => console.log(`Listening on port ${PORT}...`));
 });
