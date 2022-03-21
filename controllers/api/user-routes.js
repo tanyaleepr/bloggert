@@ -70,7 +70,7 @@ router.post('/', (req, res) => {
     });
   });
 
-  // LOGIN
+  
   router.post('/login', (req, res) => {
     User.findOne({
       where: {
