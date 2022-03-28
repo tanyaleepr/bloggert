@@ -24,25 +24,13 @@ const sess = {
   store: new SequelizeStore({ db: sequelize }),
 };
 
-// const sess = {
-//   secret: 'aguila',
-//   cookie: {
-        
-//         expires: 10 * 60 * 1200
-//   },
-//   resave: true,
-//   rolling: true,
-//   saveUninitialized: true,
-//   store: new SequelizeStore({
-//     db: sequelize
-//   }),
-// };
 // sessions
-app.use(session(sess));
-
-// process.on('uncaughtException', function (err) {
-//   console.log(err);
-// }); 
+app.use(session({
+secret: process.env.SESSION_SECRET,
+  resave: true,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}));
 
 
 //the middle
